@@ -163,11 +163,20 @@ int
 get_next_command(vfu_ctx_t *vfu_ctx, struct vfio_user_header *hdr, int *fds,
                  size_t *nr_fds);
 
+struct req_ctx {
+    struct vfio_user_header hdr;
+    int *fds;
+    int *fds_out;
+    size_t nr_fds;
+    size_t nr_fds_out;
+    struct iovec _iovecs[2];
+    struct iovec *iovecs;
+    size_t nr_iovecs;
+    bool free_iovec_data;
+};
+
 int
-exec_command(vfu_ctx_t *vfu_ctx, struct vfio_user_header *hdr, size_t size,
-             int *fds, size_t nr_fds, int **fds_out, size_t *nr_fds_out,
-             struct iovec *_iovecs, struct iovec **iovecs, size_t *nr_iovecs,
-             bool *free_iovec_data);
+exec_command(vfu_ctx_t *vfu_ctx, struct req_ctx *req, size_t size);
 
 int
 process_request(vfu_ctx_t *vfu_ctx);
