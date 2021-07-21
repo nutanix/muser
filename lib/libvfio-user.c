@@ -482,6 +482,7 @@ handle_dma_map(vfu_ctx_t *vfu_ctx, vfu_msg_t *msg,
     int fd = -1;
     int ret;
     uint32_t prot = 0;
+    bool exist = false;
 
     assert(vfu_ctx != NULL);
     assert(msg != NULL);
@@ -524,7 +525,7 @@ handle_dma_map(vfu_ctx_t *vfu_ctx, vfu_msg_t *msg,
 
     ret = dma_controller_add_region(vfu_ctx->dma, (void *)dma_map->addr,
                                     dma_map->size, fd, dma_map->offset,
-                                    prot);
+                                    prot, &exist);
     if (ret < 0) {
         ret = errno;
         vfu_log(vfu_ctx, LOG_ERR, "failed to add DMA region %s: %m", rstr);
@@ -534,7 +535,7 @@ handle_dma_map(vfu_ctx_t *vfu_ctx, vfu_msg_t *msg,
         return ERROR_INT(ret);
     }
 
-    if (vfu_ctx->dma_register != NULL) {
+    if (vfu_ctx->dma_register != NULL && !exist) {
         vfu_ctx->dma_register(vfu_ctx, &vfu_ctx->dma->regions[ret].info);
     }
     return 0;
